@@ -23,34 +23,49 @@ type Peer struct {
 }
 
 // ReadConfig parses WireGuard configuration and returns interface
+//
+// See https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
 func ReadConfig(source interface{}) (*Config, error) {
 
+	// Read the INI from source
 	cfg, err := ini.ShadowLoad(source)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Pull out the INI interface section
-	interfaceSection := cfg.Section("Interface")
-	// Get values
+	// The new configuration
+	config := new(Config)
+
+	// Pull out the conf [Interface] section
+	interfaceSection, err := cfg.GetSection("Interface")
+	if err != nil {
+		return config, fmt.Errorf("Section [Interface] not found: %s", err)
+	}
+
+	// PrivateKey is required
 	privateKey, err := wgtypes.ParseKey(interfaceSection.Key("PrivateKey").String())
 	if err != nil {
-		return new(Config), fmt.Errorf("Unable to parse PrivateKey: %s", err)
+		return config, fmt.Errorf("Unable to parse PrivateKey: %s", err)
 	}
-	listenPort, err := strconv.ParseUint(interfaceSection.Key("ListenPort").Value(), 10, 16)
-	if err != nil {
-		return new(Config), fmt.Errorf("Unable to parse ListenPort: %s", err)
+	config.PrivateKey = privateKey
+
+	// Other keys are optional
+	if interfaceSection.HasKey("ListenPort") {
+		listenPort, err := strconv.ParseUint(interfaceSection.Key("ListenPort").Value(), 10, 16)
+		if err != nil {
+			return config, fmt.Errorf("Unable to parse ListenPort: %s", err)
+		}
+		// Have to go through a function to return a pointer to primitive because nil matters
+		config.ListenPort = uint16(listenPort)
 	}
-	fwMark, err := strconv.ParseUint(interfaceSection.Key("FwMark").Value(), 0, 32)
-	if err != nil {
-		return new(Config), fmt.Errorf("Unable to parse FwMark: %s", err)
+	if interfaceSection.HasKey("FwMark") {
+		fwMark, err := strconv.ParseUint(interfaceSection.Key("FwMark").Value(), 0, 32)
+		if err != nil {
+			return config, fmt.Errorf("Unable to parse FwMark: %s", err)
+		}
+		// Have to go through a function to return a pointer to primitive because nil matters
+		config.FwMark = uint32(fwMark)
 	}
 
-	Config := Config{
-		PrivateKey: privateKey,
-		ListenPort: uint16(listenPort),
-		FwMark:     uint32(fwMark),
-	}
-
-	return &Config, err
+	return config, err
 }
