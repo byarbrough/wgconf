@@ -12,9 +12,9 @@ import (
 // See https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
 type Config struct {
 	PrivateKey string
-	ListenPort uint16
-	FwMark     uint32
-	Peers      []*Peer
+	ListenPort uint16  `ini:",omitempty"`
+	FwMark     uint32  `ini:",omitempty"`
+	Peers      []*Peer `ini:",omitempty,allowshadow"`
 }
 
 // Peer is a WireGuard [Peer] section
@@ -29,8 +29,13 @@ type Peer struct {
 // ReadConfig parses WireGuard configuration and returns interface
 func ReadConfig(source interface{}) (*Config, error) {
 
+	// Custom options for duplicate sections
+	loadOptions := ini.LoadOptions{
+		AllowShadows:           true,
+		AllowNonUniqueSections: true,
+	}
 	// Read the INI from source
-	cfg, err := ini.ShadowLoad(source)
+	cfg, err := ini.LoadSources(loadOptions, source)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,11 +52,11 @@ func ReadConfig(source interface{}) (*Config, error) {
 	}
 
 	// Handle any [Peer] sections
-	sections := cfg.Sections()
-
-	for s := range sections {
-		if sections[s].Name() == "Peer" {
-			peer, err := ReadPeer(sections[s])
+	x := cfg.Sections()
+	fmt.Println(x)
+	for _, s := range cfg.Sections() {
+		if s.Name() == "Peer" {
+			peer, err := ReadPeer(s)
 			if err != nil {
 				return config, fmt.Errorf("Error parsing Peer: %s", err)
 			}
@@ -74,7 +79,7 @@ func ReadInterface(section *ini.Section) (*Config, error) {
 		return nil, fmt.Errorf("Section must have name \"%s\"", "Interface")
 	}
 
-	err := section.StrictMapTo(config)
+	err := section.MapTo(config)
 	if err != nil {
 		return nil, fmt.Errorf("Error maping [Interface]: %s", err)
 	}

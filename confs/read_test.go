@@ -110,9 +110,9 @@ func TestReadConfig(t *testing.T) {
 
 	t.Run("interface only", func(t *testing.T) {
 		buffer := []byte(`
-		[Interface]
-		PrivateKey = aClVSMm9VEDx3aYAXg4FYKhAvchXw10e0IABJgrBjUM=
-		`)
+			[Interface]
+			PrivateKey = aClVSMm9VEDx3aYAXg4FYKhAvchXw10e0IABJgrBjUM=
+			`)
 
 		// Get the configuration as a Config
 		got, err := confs.ReadConfig(buffer)
@@ -133,12 +133,12 @@ func TestReadConfig(t *testing.T) {
 
 	t.Run("one peer", func(t *testing.T) {
 		buffer := []byte(`
-		[Interface]
-		PrivateKey = 6CajzW/qXuB07um+50CYU+N4Tucud3xtllh6JYsCEUQ=
+			[Interface]
+			PrivateKey = 6CajzW/qXuB07um+50CYU+N4Tucud3xtllh6JYsCEUQ=
 
-		[Peer]
-		PublicKey =3VpNW2azh4M61+ziZX0O768l2IemS5QhACgQMaMfIFs=
-		`)
+			[Peer]
+			PublicKey =3VpNW2azh4M61+ziZX0O768l2IemS5QhACgQMaMfIFs=
+			`)
 
 		// Get the configuration as a Config
 		got, err := confs.ReadConfig(buffer)
@@ -156,6 +156,45 @@ func TestReadConfig(t *testing.T) {
 			PrivateKey: privateKey,
 		}
 		want.Peers = append(want.Peers, newPeer)
+
+		if !cmp.Equal(got, want) {
+			t.Fatalf("got %v want %v", got, want)
+		}
+	})
+
+	t.Run("many peers", func(t *testing.T) {
+		buffer := []byte(`
+		[Interface]
+		PrivateKey = 6CajzW/qXuB07um+50CYU+N4Tucud3xtllh6JYsCEUQ=
+
+		[Peer]
+		PublicKey =3VpNW2azh4M61+ziZX0O768l2IemS5QhACgQMaMfIFs=
+
+		[Peer]
+		PublicKey = o2voeRt/89DwDbB38oiZ92PeGZb30/jdQdQnLECPPDE=
+		`)
+
+		// Get the configuration as a Config
+		got, err := confs.ReadConfig(buffer)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Expected values
+		privateKey := "6CajzW/qXuB07um+50CYU+N4Tucud3xtllh6JYsCEUQ="
+		peerPublicKey := "3VpNW2azh4M61+ziZX0O768l2IemS5QhACgQMaMfIFs="
+		peer1 := &confs.Peer{
+			PublicKey: peerPublicKey,
+		}
+		peerPublicKey = "o2voeRt/89DwDbB38oiZ92PeGZb30/jdQdQnLECPPDE="
+		peer2 := &confs.Peer{
+			PublicKey: peerPublicKey,
+		}
+
+		want := &confs.Config{
+			PrivateKey: privateKey,
+		}
+		want.Peers = append(want.Peers, peer1, peer2)
 
 		if !cmp.Equal(got, want) {
 			t.Fatalf("got %v want %v", got, want)
