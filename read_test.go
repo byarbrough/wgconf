@@ -1,10 +1,10 @@
-package confs_test
+package wgconf_test
 
 import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"gitlab.com/byarbrough/wg-confs/confs"
+	"gitlab.com/byarbrough/wgconf"
 )
 
 func TestReadInterface(t *testing.T) {
@@ -19,12 +19,12 @@ func TestReadInterface(t *testing.T) {
 	`)
 
 		// Convert buffer to section
-		section, err := confs.GetSection(buffer, "Interface")
+		section, err := wgconf.GetSection(buffer, "Interface")
 		if err != nil {
 			t.Fatal(err)
 		}
 		// Get the configuration as a Config
-		got, err := confs.ReadInterface(section)
+		got, err := wgconf.ReadInterface(section)
 		if err != nil {
 			t.Error(err)
 		}
@@ -32,7 +32,7 @@ func TestReadInterface(t *testing.T) {
 		// Expected values
 		privateKey := "OPRGA+cLdEcPLIPKns/f1rqhzHTxuu1MS4ZNTxxinVc="
 
-		want := &confs.Config{
+		want := &wgconf.Config{
 			PrivateKey: privateKey,
 			ListenPort: uint16(51820),
 			FwMark:     uint32(0x4D2),
@@ -51,12 +51,12 @@ func TestReadInterface(t *testing.T) {
 		`)
 
 		// Convert buffer to section
-		section, err := confs.GetSection(buffer, "Interface")
+		section, err := wgconf.GetSection(buffer, "Interface")
 		if err != nil {
 			t.Fatal(err)
 		}
 		// Get the configuration as a Config
-		got, err := confs.ReadInterface(section)
+		got, err := wgconf.ReadInterface(section)
 		if err != nil {
 			t.Error(err)
 		}
@@ -64,7 +64,7 @@ func TestReadInterface(t *testing.T) {
 		// Expected values
 		privateKey := "kFDRIITet2LwACfznYaMdx4YlXsIlKdqcnuFE1zY32Y="
 
-		want := new(confs.Config)
+		want := new(wgconf.Config)
 		want.PrivateKey = privateKey
 
 		if !cmp.Equal(got, want) {
@@ -83,12 +83,12 @@ func TestReadPeer(t *testing.T) {
 		`)
 
 		// Convert buffer to section
-		section, err := confs.GetSection(buffer, "Peer")
+		section, err := wgconf.GetSection(buffer, "Peer")
 		if err != nil {
 			t.Fatal(err)
 		}
 		// Get the configuration as a Config
-		got, err := confs.ReadPeer(section)
+		got, err := wgconf.ReadPeer(section)
 		if err != nil {
 			t.Error(err)
 		}
@@ -96,7 +96,7 @@ func TestReadPeer(t *testing.T) {
 		// Expected values
 		publicKey := "4F5mIj+fcdE4hTEYLnjJHls+Zigy++wy5yiS6B9k8kM="
 
-		want := &confs.Peer{
+		want := &wgconf.Peer{
 			PublicKey: publicKey,
 		}
 		if !cmp.Equal(got, want) {
@@ -115,7 +115,7 @@ func TestReadConfig(t *testing.T) {
 			`)
 
 		// Get the configuration as a Config
-		got, err := confs.ReadConfig(buffer)
+		got, err := wgconf.ReadConfig(buffer)
 		if err != nil {
 			t.Error(err)
 		}
@@ -123,7 +123,7 @@ func TestReadConfig(t *testing.T) {
 		// Expected values
 		privateKey := "aClVSMm9VEDx3aYAXg4FYKhAvchXw10e0IABJgrBjUM="
 
-		want := new(confs.Config)
+		want := new(wgconf.Config)
 		want.PrivateKey = privateKey
 
 		if !cmp.Equal(got, want) {
@@ -141,7 +141,7 @@ func TestReadConfig(t *testing.T) {
 			`)
 
 		// Get the configuration as a Config
-		got, err := confs.ReadConfig(buffer)
+		got, err := wgconf.ReadConfig(buffer)
 		if err != nil {
 			t.Error(err)
 		}
@@ -149,10 +149,10 @@ func TestReadConfig(t *testing.T) {
 		// Expected values
 		privateKey := "6CajzW/qXuB07um+50CYU+N4Tucud3xtllh6JYsCEUQ="
 		peerPublicKey := "3VpNW2azh4M61+ziZX0O768l2IemS5QhACgQMaMfIFs="
-		newPeer := &confs.Peer{
+		newPeer := &wgconf.Peer{
 			PublicKey: peerPublicKey,
 		}
-		want := &confs.Config{
+		want := &wgconf.Config{
 			PrivateKey: privateKey,
 		}
 		want.Peers = append(want.Peers, newPeer)
@@ -175,7 +175,7 @@ func TestReadConfig(t *testing.T) {
 		`)
 
 		// Get the configuration as a Config
-		got, err := confs.ReadConfig(buffer)
+		got, err := wgconf.ReadConfig(buffer)
 		if err != nil {
 			t.Error(err)
 		}
@@ -183,15 +183,15 @@ func TestReadConfig(t *testing.T) {
 		// Expected values
 		privateKey := "6CajzW/qXuB07um+50CYU+N4Tucud3xtllh6JYsCEUQ="
 		peerPublicKey := "3VpNW2azh4M61+ziZX0O768l2IemS5QhACgQMaMfIFs="
-		peer1 := &confs.Peer{
+		peer1 := &wgconf.Peer{
 			PublicKey: peerPublicKey,
 		}
 		peerPublicKey = "o2voeRt/89DwDbB38oiZ92PeGZb30/jdQdQnLECPPDE="
-		peer2 := &confs.Peer{
+		peer2 := &wgconf.Peer{
 			PublicKey: peerPublicKey,
 		}
 
-		want := &confs.Config{
+		want := &wgconf.Config{
 			PrivateKey: privateKey,
 		}
 		want.Peers = append(want.Peers, peer1, peer2)

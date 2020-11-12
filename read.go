@@ -1,30 +1,11 @@
-package confs
+package wgconf
 
 import (
 	"fmt"
 	"log"
-	"net"
 
 	"gopkg.in/ini.v1"
 )
-
-// Config is a WireGuard INI representation
-// See https://git.zx2c4.com/wireguard-tools/about/src/man/wg.8
-type Config struct {
-	PrivateKey string
-	ListenPort uint16  `ini:",omitempty"`
-	FwMark     uint32  `ini:",omitempty"`
-	Peers      []*Peer `ini:",omitempty,allowshadow"`
-}
-
-// Peer is a WireGuard [Peer] section
-type Peer struct {
-	PublicKey           string
-	PresharedKey        string
-	AllowedIPs          []net.IPNet
-	EndPoint            string
-	PersistentKeepalive uint16
-}
 
 // ReadConfig parses WireGuard configuration and returns interface
 func ReadConfig(source interface{}) (*Config, error) {
@@ -52,8 +33,6 @@ func ReadConfig(source interface{}) (*Config, error) {
 	}
 
 	// Handle any [Peer] sections
-	x := cfg.Sections()
-	fmt.Println(x)
 	for _, s := range cfg.Sections() {
 		if s.Name() == "Peer" {
 			peer, err := ReadPeer(s)
@@ -79,7 +58,7 @@ func ReadInterface(section *ini.Section) (*Config, error) {
 		return nil, fmt.Errorf("Section must have name \"%s\"", "Interface")
 	}
 
-	err := section.MapTo(config)
+	err := section.StrictMapTo(config)
 	if err != nil {
 		return nil, fmt.Errorf("Error maping [Interface]: %s", err)
 	}
