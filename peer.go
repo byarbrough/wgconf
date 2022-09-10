@@ -6,36 +6,36 @@ type Conf struct {
 	// Comment in INI syntax used to help keep track of which config
 	// section belongs to which node, it's completely ignored by WireGuard
 	// and has no effect on VPN behavior.
-	Name string
+	Name string `ini:",comment"`
 	// Defines what address range the local node should route traffic for.
-	Address string
+	Address string `ini:",omitempty"`
 	// When the node is acting as a public bounce server, it should hardcode
 	// a port to listen for incoming VPN connections from the public internet.
 	// Clients not acting as relays should not set this value.
-	ListenPort uint16
+	ListenPort uint16 `ini:",omitempty"`
 	// This is the private key for the local node, never shared with other servers.
 	// All nodes must have a private key set.
-	PrivateKey string
+	PrivateKey string `ini:",omitempty"`
 	// A shared secret key between all peers. If this is configured, then all peers
 	// must have it. Should be randomly generated 32 byte number, base64 encoded.
 	// May be generated with same function as PrivateKey
-	PresharedKey string
+	PresharedKey string `ini:",omitempty"`
 	// The DNS server(s) to announce to VPN clients via DHCP,
 	// most clients will use this server for DNS requests over the VPN,
 	// but clients can also override this value locally on their nodes
-	DNS string
+	DNS string `ini:",omitempty"`
 	// Optionally run a command before the interface is brought up.
 	// This option can be specified multiple times, with commands executed in order.
-	PreUp []string
+	PreUp []string `ini:",omitempty,allowshadow"`
 	// Optionally run a command after the interface is brought up.
 	// This option can appear multiple times, as with PreUp.
-	PostUp []string
+	PostUp []string `ini:",omitempty,allowshadow"`
 	// Optionally run a command before the interface is brought down.
 	// This option can appear multiple times, as with PreUp.
-	PreDown []string
+	PreDown []string `ini:",omitempty,allowshadow"`
 	// Optionally run a command after the interface is brought down.
 	// This option can appear multiple times, as with PreUp.
-	PostDown []string
+	PostDown []string `ini:",omitempty,allowshadow"`
 }
 
 // Defines the VPN settings for a remote peer capable of routing traffic
@@ -63,8 +63,8 @@ type Peer struct {
 	PersistentKeepalive int
 }
 
-// NewConf returns a Conf with a prepopulated private key.
-// Also returns the cooresponding public key.
+// NewConf returns a Conf with a pre-populated private key.
+// Also returns the corresponding public key.
 func NewConf() (*Conf, string, error) {
 	newConf := new(Conf)
 	privateKey, err := GenKey()
