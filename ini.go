@@ -4,7 +4,7 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-func (c Conf) ToINI() *ini.File {
+func (c *Conf) ToINI() *ini.File {
 	opts := ini.LoadOptions{
 		AllowShadows:               true,
 		AllowDuplicateShadowValues: true,
@@ -12,10 +12,10 @@ func (c Conf) ToINI() *ini.File {
 	cfg := ini.Empty(opts)
 
 	// Add Required sections
-	cfg.NewSection("Interface")
-	cfg.Section("Interface").Comment = c.Name
+	// cfg.NewSection("Interface")
+	// cfg.Section("Interface").Comment = c.Name
 	// fmt.Println(c)
-	// ini.ReflectFrom(cfg, &c)
+	ini.ReflectFrom(cfg, &c)
 	//.Section("Interface").ReflectFrom(c)
 
 	// cfg.Section("Interface").NewKey("PrivateKey", c.PrivateKey)

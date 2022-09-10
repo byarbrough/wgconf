@@ -1,8 +1,13 @@
 package wgconf
 
+type Conf struct {
+	Interface *Interface
+	Peers     Peer `ini:"Peer,omitempty,allowshadow"`
+}
+
 // Conf defines the VPN settings for the local node. Cannot use WireGuard's
 // "Interface" because that is a reserved keyword in Go.
-type Conf struct {
+type Interface struct {
 	// Comment in INI syntax used to help keep track of which config
 	// section belongs to which node, it's completely ignored by WireGuard
 	// and has no effect on VPN behavior.
@@ -15,7 +20,7 @@ type Conf struct {
 	ListenPort uint16 `ini:",omitempty"`
 	// This is the private key for the local node, never shared with other servers.
 	// All nodes must have a private key set.
-	PrivateKey string `ini:",omitempty"`
+	PrivateKey string
 	// A shared secret key between all peers. If this is configured, then all peers
 	// must have it. Should be randomly generated 32 byte number, base64 encoded.
 	// May be generated with same function as PrivateKey
@@ -47,36 +52,36 @@ type Peer struct {
 	// Comment in INI syntax used to help keep track of which config
 	// section belongs to which node, it's completely ignored by WireGuard
 	// and has no effect on VPN behavior.
-	Name string
+	Name string `ini:",omitempty"`
 	// Defines the publicly accessible address for a remote peer.
-	EndPoint string
-	// The Ip ranges for which a peer will route traffic
-	AllowedIPs string
+	EndPoint string `ini:",omitempty"`
+	// The Ip ranges for which  a peer will route traffic
+	AllowedIPs string `ini:",omitempty"`
 	// This is the public key for the remote node, shareable with all peers.
 	PublicKey string
 	// A shared secret key between all peers. If this is configured, then all peers
 	// must have it. Should be randomly generated 32 byte number, base64 encoded.
 	// May be generated with same function as PrivateKey
-	PresharedKey string
+	PresharedKey string `ini:",omitempty"`
 	// How many seconds between outgoing pings to send to the peer.
-	// Keeps bidirectional connectiosn alive in the NAT router's connection table.
-	PersistentKeepalive int
+	// Keeps bidirectional connections alive in the NAT router's connection table.
+	PersistentKeepalive int `ini:",omitempty"`
 }
 
-// NewConf returns a Conf with a pre-populated private key.
+// NewInterface returns a Conf with a pre-populated private key.
 // Also returns the corresponding public key.
-func NewConf() (*Conf, string, error) {
-	newConf := new(Conf)
+func NewInterface() (*Interface, string, error) {
+	newInterface := new(Interface)
 	privateKey, err := GenKey()
-	newConf.PrivateKey = privateKey
+	newInterface.PrivateKey = privateKey
 	if err != nil {
 		return nil, "", err
 	}
 
-	pubKey, err := PubKey(newConf.PrivateKey)
+	pubKey, err := PubKey(newInterface.PrivateKey)
 	if err != nil {
 		return nil, "", nil
 	}
 
-	return newConf, pubKey, nil
+	return newInterface, pubKey, nil
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewConf(t *testing.T) {
-	newConf, gotPub, err := wgconf.NewConf()
+	newConf, gotPub, err := wgconf.NewInterface()
 	if err != nil {
 		t.Error(err)
 	}
