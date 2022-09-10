@@ -1,8 +1,11 @@
 package wgconf
 
+import "time"
+
 type Conf struct {
 	Interface *Interface
-	Peers     Peer `ini:"Peer,omitempty,allowshadow"`
+	// Peers     *[]Peer `ini:"Peer,omitempty,allowshadow"`
+	MyPubKey []time.Time `ini:"Peer,omitempty,allowshadow"`
 }
 
 // Conf defines the VPN settings for the local node. Cannot use WireGuard's

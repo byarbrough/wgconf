@@ -3,6 +3,7 @@ package wgconf_test
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/byarbrough/wgconf"
 )
@@ -15,16 +16,21 @@ func TestToINI(t *testing.T) {
 	interf.PreDown = append(interf.PreDown, "first", "second")
 	interf.Name = "My first test"
 
-	newPeer := wgconf.Peer{
-		PublicKey: "DfNSXkX5tupa3P6VDypiKOhSsb660cHVyr4aNXd2px8=",
-	}
+	// newPeer := wgconf.Peer{
+	// 	PublicKey: "DfNSXkX5tupa3P6VDypiKOhSsb660cHVyr4aNXd2px8=",
+	// }
 
 	// var peers = []wgconf.Peer{}
 	// peers = append(peers, newPeer)
+	pubKeys := []time.Time{
+		time.Now(),
+		time.Now(),
+	}
 
 	c := wgconf.Conf{
 		Interface: interf,
-		Peers:     newPeer,
+		// Peers:     &peers,
+		MyPubKey: pubKeys,
 	}
 
 	got := c.ToINI()
