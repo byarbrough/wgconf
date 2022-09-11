@@ -3,37 +3,35 @@ package wgconf_test
 import (
 	"os"
 	"testing"
-	"time"
 
 	"github.com/byarbrough/wgconf"
 )
 
 func TestToINI(t *testing.T) {
 
-	interf := new(wgconf.Interface)
-	interf.PrivateKey = "2KC6f9xbKYQR1Wsw/X8sRIReHoJJ0B4mBgRBd7Ob3G4="
-	interf.ListenPort = 51820
-	interf.PreDown = append(interf.PreDown, "first", "second")
-	interf.Name = "My first test"
+	interf := wgconf.Interface{
+		PrivateKey: "2KC6f9xbKYQR1Wsw/X8sRIReHoJJ0B4mBgRBd7Ob3G4=",
+		ListenPort: 51820,
+		PreDown:    []string{"first", "second"},
+		Name:       "My first test",
+	}
 
-	// newPeer := wgconf.Peer{
-	// 	PublicKey: "DfNSXkX5tupa3P6VDypiKOhSsb660cHVyr4aNXd2px8=",
-	// }
-
-	// var peers = []wgconf.Peer{}
-	// peers = append(peers, newPeer)
-	pubKeys := []time.Time{
-		time.Now(),
-		time.Now(),
+	newPeer := wgconf.Peer{
+		PublicKey: "DfNSXkX5tupa3P6VDypiKOhSsb660cHVyr4aNXd2px8=",
+	}
+	newPeer1 := wgconf.Peer{
+		PublicKey: "1ZWjaFuTNEuR4qYua4xN6hLJPhK75CmEiUrXwpoLD1Y=",
 	}
 
 	c := wgconf.Conf{
 		Interface: interf,
-		// Peers:     &peers,
-		MyPubKey: pubKeys,
+		Peers:     []wgconf.Peer{newPeer, newPeer1},
 	}
 
-	got := c.ToINI()
+	got, err := c.ToINI()
+	if err != nil {
+		t.Error(err)
+	}
 
 	got.WriteTo(os.Stdout)
 
