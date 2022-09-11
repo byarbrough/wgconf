@@ -7,12 +7,12 @@ import (
 	"github.com/byarbrough/wgconf"
 )
 
-func TestToINI(t *testing.T) {
+func TestWriteINI(t *testing.T) {
 
 	interf := wgconf.Interface{
 		PrivateKey: "2KC6f9xbKYQR1Wsw/X8sRIReHoJJ0B4mBgRBd7Ob3G4=",
 		ListenPort: 51820,
-		PreDown:    []string{"first", "second"},
+		PreDown:    []string{"first rule", "second rule"},
 		Name:       "My first test",
 	}
 
@@ -21,7 +21,8 @@ func TestToINI(t *testing.T) {
 		Name:      "First Peer",
 	}
 	newPeer1 := wgconf.Peer{
-		PublicKey: "1ZWjaFuTNEuR4qYua4xN6hLJPhK75CmEiUrXwpoLD1Y=",
+		PublicKey:    "1ZWjaFuTNEuR4qYua4xN6hLJPhK75CmEiUrXwpoLD1Y=",
+		PresharedKey: "IFazrJcuMZi9PECth++BfxIY2GdjOWMzqTuQp5Ddb1c=",
 	}
 
 	c := wgconf.Conf{
@@ -29,13 +30,8 @@ func TestToINI(t *testing.T) {
 		Peers:     []wgconf.Peer{newPeer, newPeer1},
 	}
 
-	c.WriteINI(os.Stdout)
-
-	// got, err := c.ToINI()
-	// if err != nil {
-	// 	t.Error(err)
-	// }
-
-	// got.WriteTo(os.Stdout)
+	t.Run("full conf", func(t *testing.T) {
+		c.WriteINI(os.Stderr)
+	})
 
 }
