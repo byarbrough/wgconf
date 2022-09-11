@@ -12,7 +12,7 @@ type Interface struct {
 	// Comment in INI syntax used to help keep track of which config
 	// section belongs to which node, it's completely ignored by WireGuard
 	// and has no effect on VPN behavior.
-	Name string `ini:",comment"`
+	Name string `ini:",ignore"`
 	// Defines what address range the local node should route traffic for.
 	Address string `ini:",omitempty"`
 	// When the node is acting as a public bounce server, it should hardcode

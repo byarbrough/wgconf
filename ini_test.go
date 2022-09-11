@@ -18,6 +18,7 @@ func TestToINI(t *testing.T) {
 
 	newPeer := wgconf.Peer{
 		PublicKey: "DfNSXkX5tupa3P6VDypiKOhSsb660cHVyr4aNXd2px8=",
+		Name:      "First Peer",
 	}
 	newPeer1 := wgconf.Peer{
 		PublicKey: "1ZWjaFuTNEuR4qYua4xN6hLJPhK75CmEiUrXwpoLD1Y=",
@@ -28,11 +29,13 @@ func TestToINI(t *testing.T) {
 		Peers:     []wgconf.Peer{newPeer, newPeer1},
 	}
 
-	got, err := c.ToINI()
-	if err != nil {
-		t.Error(err)
-	}
+	c.WriteINI(os.Stdout)
 
-	got.WriteTo(os.Stdout)
+	// got, err := c.ToINI()
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+
+	// got.WriteTo(os.Stdout)
 
 }
